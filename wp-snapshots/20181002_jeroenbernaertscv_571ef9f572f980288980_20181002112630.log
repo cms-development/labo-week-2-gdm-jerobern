@@ -1,0 +1,38 @@
+********************************************************************************
+DUPLICATOR-LITE PACKAGE-LOG: 2 October 2018 11:26
+NOTICE: Do NOT post to public sites or forums 
+********************************************************************************
+VERSION:	1.2.48
+WORDPRESS:	4.9.8
+PHP INFO:	7.2.1 | SAPI: cli-server
+SERVER:		PHP 7.2.1 Development Server 
+PHP TIME LIMIT: (0) no time limit imposed 
+PHP MAX MEMORY: 2048M (128M default) 
+MEMORY STACK: 16MB 
+
+********************************************************************************
+DATABASE:
+********************************************************************************
+BUILD MODE:   MYSQLDUMP
+MYSQLTIMEOUT: 5000
+MYSQLDUMP:    Is Supported 
+
+==================================================================================
+DUPLICATOR ERROR
+Please try again! If the error persists see the Duplicator 'Help' menu.
+---------------------------------------------------------------------------------
+MESSAGE:
+	Reserverd SQL file detected
+DETAILS:
+	The file database.sql was found at [/Users/jeroen/code/CMS/labo1/database.sql].
+	Please remove/rename this file to continue with the package creation.
+TRACE:
+	 1. class.pack.database.php : Error (74)
+	 2. class.pack.php : build (236)
+	 3. ctrl.package.php : runBuild (61)
+	 4. class-wp-hook.php : duplicator_package_build (286)
+	 5. class-wp-hook.php : apply_filters (310)
+	 6. plugin.php : do_action (453)
+	 7. admin-ajax.php : do_action (100)
+==================================================================================
+

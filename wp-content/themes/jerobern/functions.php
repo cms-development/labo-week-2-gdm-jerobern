@@ -141,6 +141,61 @@ function recipes_taxonomy() {
 add_action( 'init', 'recipes_taxonomy');
 
 /**
+ * CUSTOM FIELDS RECIPES
+ */
+function jerobern_add_recipe_box() {
+  $screens = array('recipes');
+  foreach($screens as $screen) {
+      add_meta_box(
+          'recipe_box',
+          __('Custom Recipe Fields', 'jerobern'),
+          'jerobern_recipe_box_callback',
+          $screen
+      );
+  }
+}
+
+function jerobern_recipe_box_callback($post) {
+  wp_nonce_field('recipe_save_meta_box_data', 'recipe_meta_box_nonce');
+
+  $subtitle = get_post_meta($post->ID,'_recipe_subtitle', true);
+  echo '<label for="recipe_subtitle">'. __('Subtitle', 'jerobern') .'</label>';
+  echo '<input style="width:100%; margin:0" type="text" id="recipe_subtitle" name="recipe_subtitle" size="255" value="'. $subtitle .'">';
+
+  $ingredients = get_post_meta($post->ID,'_recipe_ingredients', true);
+  echo '<label for="recipe_ingredients">'. __('Ingredients', 'jerobern') .'</label>';
+  echo '<input style="width:100%; margin:0" type="text" id="recipe_ingredients" name="recipe_ingredients" size="255" value="'. $ingredients .'">';
+}
+
+add_action('add_meta_boxes', 'jerobern_add_recipe_box');
+
+function jerobern_save_recipe_data($postid) {
+  if(! isset($_POST['recipe_meta_box_nonce'])) {
+      return;
+  }
+  if(! wp_verify_nonce($_POST['recipe_meta_box_nonce'], 'recipe_save_meta_box_data')) {
+      return;
+  }
+  if( defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+      return;
+  }
+  if(! current_user_can('edit_post', $post_id)) {
+      return;
+  }
+  if( isset($_POST['recipe_subtitle'])) {
+      $subtitle = sanitize_text_field($_POST['recipe_subtitle']);
+      update_post_meta($postid, '_recipe_subtitle', $subtitle);
+  }
+  if( isset($_POST['recipe_ingredients'])) {
+      $ingredients = sanitize_text_field($_POST['recipe_ingredients']);
+      update_post_meta($postid, '_recipe_ingredients', $ingredients);
+  }
+
+}
+
+add_action('save_post', 'jerobern_save_recipe_data');
+
+/**
  * CPT EVENTS
  */
 function jerobern_register_events() {
@@ -175,7 +230,7 @@ function jerobern_register_events() {
           'revisions'
       ),
       'taxonomies' => array(
-          'provincie', 'tags', 'setting'
+          'province', 'post_tag', 'setting'
       ),
       'menu_position' => 6,
       'exclude_from_search' => false,
@@ -206,7 +261,7 @@ function events_taxonomy() {
     );    
   
   register_taxonomy(  
-      'provincie', 
+      'province', 
       'events',
       array(  
           'hierarchical' => true,  
@@ -249,11 +304,50 @@ function events_taxonomy() {
 
 add_action( 'init', 'events_taxonomy');
 
-function add_tags_to_events(){
-    register_taxonomy_for_object_type('post_tag', 'events');
+/**
+ * CPT CHEFS
+ */
+function jerobern_register_chefs() {
+  $labels = array(
+      'name' => __('Chefs', 'jerobern'),
+      'singular_name' => __('Chef', 'jerobern'),
+      'add_new' => __('Add New Chef', 'jerobern'),
+      'all_items' => __('All Chefs', 'jerobern'),
+      'add_new_items' => __('Add New Chef', 'jerobern'),
+      'edit_item' => __('Edit Chef', 'jerobern'),
+      'new_item' => __('New Chef', 'jerobern'),
+      'view_item' => __('View Chef', 'jerobern'),
+      'search_item' => __('Search Chef', 'jerobern'),
+      'not_found' => __('Chef not found', 'jerobern'),
+      'not_found_in_trash' => __('Chef not found in the trash', 'jerobern'),
+      'parent_item_colon' => __('Parent Chef', 'jerobern'),
+      
+  );
+  $args = array(  
+      'labels' => $labels,
+      'public' => true,
+      'has_archive' => true,
+      'publicly_queryable' => true,
+      'query_var' => true,
+      'capability_type' => 'post',
+      'hierarchical' => false,
+      'supports' => array(
+          'title',
+          'editor',
+          'excerpt',
+          'thumbnail',
+          'revisions'
+      ),
+      'taxonomies' => array(),
+      'menu_position' => 6,
+      'exclude_from_search' => false,
+      'menu_icon' => 'dashicons-universal-access',
+  );
+
+  register_post_type('chefs', $args);
 }
 
-add_action('init','add_tags_to_events');
+add_action('init', 'jerobern_register_chefs');
 
 add_action('after_setup_theme', 'jerobern_setup');
 
